@@ -1,39 +1,45 @@
-# BlinkChat
-A real-time chat application that lets users connect instantly through unique shareable links.
+# **BlinkChat**
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+BlinkChat is a simple, real-time chat application that allows users to create unique chat rooms without needing to log in. Just generate a link, share it, and start chatting. Messages are automatically deleted after a set period, ensuring your conversations are temporary and private.
+
+**Note: This project, is a side project created for the purpose of learning and experimenting with Firebase and Next.js. It's a fun and educational exploration of real-time web technologies, focusing on building a simple and engaging chat application.**
 
 ## Getting Started
 
-First, run the development server:
+First, run the develipment Server
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
+yarn
+yarn run dev
+```
+## **Features**
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Instant Chat Room Creation:** Generate a unique chat link with one click—no login required.
+- **Real-Time Messaging:** Messages are synced across all participants instantly.
+- **Ephemeral Messages:** Chat messages automatically expire and are deleted after a set time (Still deciding).
+- **Anonymous Chatting:** Users can chat without revealing their identity; random pet names are assigned to maintain privacy.
+- **Easy to Use:** A minimalistic and user-friendly interface for seamless chatting.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## **Tech Stack**
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- **Frontend:** Next.js (React), TypeScript, Material UI for styling.
+- **Backend:** Firebase (Firestore and Cloud Functions).
+- **Real-Time Communication:** Firebase Firestore for syncing messages.
+- **Deployment:** Vercel for hosting the Next.js application.
 
-## Learn More
+## **Project Structure**
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```plaintext
+blinkchat/
+├── public/                        # Static assets
+├── src/
+│   ├── app/
+│   │   ├── chat/                  # Chat page for each session
+│   │   │   └── [id]/page.tsx      # Dynamic route for chat rooms
+│   │   ├── layout.tsx             # Main layout component
+│   │   └── page.tsx               # Home page for link generation
+│   ├── components/                # Reusable Components
+│   └── styles/                    # Global and component-specific styles
+├── .env.local                     # Environment variables (local setup)
+├── next.config.mjs                # Next.js configuration
+└── README.md                      # It's me, Readme!
