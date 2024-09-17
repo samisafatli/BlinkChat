@@ -1,5 +1,5 @@
 import { Box, Container, Typography } from '@mui/material'
-import React, { useState } from 'react'
+import React from 'react'
 
 const Header = () => {
     return (
@@ -7,7 +7,7 @@ const Header = () => {
             <Box sx={{
                 padding: '10px 0',
                 marginBottom: '20px',
-                borderBottom: '2px solid red'
+                borderBottom: '1px solid black'
             }}>
                 <Typography variant='h4'>BlinkChat</Typography>
             </Box>
