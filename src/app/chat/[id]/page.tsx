@@ -1,7 +1,7 @@
 "use client"
 
 import { Box, Button, TextField, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { collection, addDoc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import { db } from '@/app/firebase/clientApp';
@@ -72,6 +72,16 @@ const ChatPage = () => {
         }
     };
 
+    const messageEndRef = useRef<null | HTMLDivElement>(null)
+
+    const scrollToBottom = () => {
+        messageEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    }
+
+    useEffect(() => {
+        scrollToBottom()
+    }, [messages])
+
     return (
         <Box sx={chatStyles.chatContainer}>
             <Typography variant="h5" gutterBottom>
@@ -88,6 +98,7 @@ const ChatPage = () => {
                         </Box>
                     </Box>
                 ))}
+                <div ref={messageEndRef} />
             </Box>
             <TextField
                 fullWidth
