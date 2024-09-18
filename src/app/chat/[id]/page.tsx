@@ -1,12 +1,13 @@
-"use client";
+"use client"
 
+import { Box, Button, TextField, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { collection, addDoc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
-import { Box, Button, TextField, Typography } from '@mui/material';
 import { db } from '@/app/firebase/clientApp';
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from '@/app/firebase/clientApp';
+import chatStyles from '../[id]/chatStyle';
 
 type Message = {
     id: string;
@@ -24,40 +25,35 @@ const ChatPage = () => {
     const [user] = useAuthState(auth);
 
     useEffect(() => {
-        if (!id) {
-            console.log('No chat ID available');
-            return;
+        if (typeof window !== "undefined") {
+            if (!id) return;
+            const messagesQuery = query(
+                collection(db, 'messages'),
+                where('chatId', '==', id),
+                orderBy('createdAt', 'asc')
+            );
+
+            const unsubscribe = onSnapshot(
+                messagesQuery,
+                (snapshot) => {
+                    if (snapshot.empty) return;
+
+                    const fetchedMessages = snapshot.docs.map((doc) => ({
+                        id: doc.id,
+                        ...doc.data(),
+                    })) as Message[];
+                    setMessages(fetchedMessages);
+                },
+                (error) => {
+                    console.error('Error fetching messages:', error);
+                }
+            );
+
+            return () => {
+                unsubscribe();
+            };
         }
-
-        console.log('Setting up query for chat ID:', id);
-
-        const messagesQuery = query(
-            collection(db, 'messages'),
-            where('chatId', '==', id),
-            orderBy('createdAt', 'asc')
-        );
-
-        const unsubscribe = onSnapshot(
-            messagesQuery,
-            (snapshot) => {
-                if (snapshot.empty) return
-
-                const fetchedMessages = snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                })) as Message[];
-                setMessages(fetchedMessages);
-            },
-            (error) => {
-                console.error('Error fetching messages:', error);
-            }
-        );
-        return () => {
-            unsubscribe();
-        };
     }, [id]);
-
-
 
     const handleSendMessage = async () => {
         if (!message.trim()) return;
@@ -77,40 +73,18 @@ const ChatPage = () => {
     };
 
     return (
-        <Box sx={{ padding: 4 }}>
+        <Box sx={chatStyles.chatContainer}>
             <Typography variant="h5" gutterBottom>
                 Chat Room: {id}
             </Typography>
-            <Box
-                sx={{
-                    maxHeight: '400px',
-                    overflowY: 'auto',
-                    border: '1px solid #ccc',
-                    padding: 2,
-                    marginBottom: 2,
-                }}
-            >
+            <Box sx={chatStyles.messageContainer}>
                 {messages.map((msg) => (
                     <Box
                         key={msg.id}
-                        sx={{
-                            display: 'flex',
-                            justifyContent: msg.userId === user?.uid ? 'flex-end' : 'flex-start',
-                            marginBottom: '10px',
-                        }}
+                        sx={chatStyles.messageBox(msg.userId === user?.uid)}
                     >
-                        <Box
-                            sx={{
-                                backgroundColor: msg.userId === user?.uid ? '#007bff' : '#e0e0e0',
-                                color: msg.userId === user?.uid ? '#fff' : '#000',
-                                borderRadius: '10px',
-                                padding: '10px',
-                                maxWidth: '60%',
-                            }}
-                        >
-                            <Typography variant="body1">
-                                {msg.text}
-                            </Typography>
+                        <Box sx={chatStyles.message(msg.userId === user?.uid)}>
+                            <Typography variant="body1">{msg.text}</Typography>
                         </Box>
                     </Box>
                 ))}
@@ -122,8 +96,14 @@ const ChatPage = () => {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                sx={chatStyles.textField}
             />
-            <Button variant="contained" color="primary" onClick={handleSendMessage} sx={{ marginTop: 2 }}>
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSendMessage}
+                sx={chatStyles.sendButton}
+            >
                 Send
             </Button>
         </Box>

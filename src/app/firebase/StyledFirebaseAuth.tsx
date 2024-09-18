@@ -1,44 +1,46 @@
-'use client'
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import * as firebaseui from 'firebaseui';
-import 'firebaseui/dist/firebaseui.css';
+import { useEffect, useRef, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { Auth } from "firebase/auth";
+import * as firebaseui from "firebaseui";
+import "firebaseui/dist/firebaseui.css";
 
 interface Props {
     uiConfig: firebaseui.auth.Config;
     uiCallback?(ui: firebaseui.auth.AuthUI): void;
-    firebaseAuth: any;
+    firebaseAuth: Auth;
     className?: string;
 }
-
 
 const StyledFirebaseAuth = ({ uiConfig, firebaseAuth, className, uiCallback }: Props) => {
     const [userSignedIn, setUserSignedIn] = useState(false);
     const elementRef = useRef(null);
 
     useEffect(() => {
-        const firebaseUiWidget = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(firebaseAuth);
-        if (uiConfig.signInFlow === 'popup')
-            firebaseUiWidget.reset();
+        if (typeof window !== "undefined") {
+            import("firebaseui").then((firebaseui) => {
+                const firebaseUiWidget =
+                    firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(firebaseAuth);
 
-        const unregisterAuthObserver = onAuthStateChanged(firebaseAuth, (user) => {
-            if (!user && userSignedIn)
-                firebaseUiWidget.reset();
-            setUserSignedIn(!!user);
-        });
+                if (uiConfig.signInFlow === "popup") firebaseUiWidget.reset();
 
-        if (uiCallback)
-            uiCallback(firebaseUiWidget);
+                const unregisterAuthObserver = onAuthStateChanged(firebaseAuth, (user) => {
+                    if (!user && userSignedIn) firebaseUiWidget.reset();
+                    setUserSignedIn(!!user);
+                });
 
-        // @ts-ignore
-        firebaseUiWidget.start(elementRef.current, uiConfig);
+                if (uiCallback) uiCallback(firebaseUiWidget);
+                // @ts-ignore
+                firebaseUiWidget.start(elementRef.current, uiConfig);
 
-        return () => {
-            unregisterAuthObserver();
-            firebaseUiWidget.reset();
-        };
-    }, [firebaseui, uiConfig]);
+                return () => {
+                    unregisterAuthObserver();
+                    firebaseUiWidget.reset();
+                };
+            });
+        }
+    }, [firebaseAuth, uiConfig, uiCallback, userSignedIn]);
 
     return <div className={className} ref={elementRef} />;
 };

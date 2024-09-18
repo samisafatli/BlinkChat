@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react"
 import { auth } from "../firebase/clientApp"
 import StyledFirebaseAuth from "../firebase/StyledFirebaseAuth"
