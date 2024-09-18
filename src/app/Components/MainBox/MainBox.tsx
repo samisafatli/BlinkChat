@@ -2,17 +2,14 @@
 
 import { Button, Container, Typography } from '@mui/material';
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 const MainBox = () => {
     const [link, setLink] = useState('');
-    const router = useRouter();
 
     const createLink = () => {
         const uniqueId = Math.random().toString(36).substring(2, 9);
         const uniqueLink = `/chat/${uniqueId}`;
         setLink(uniqueLink);
-        router.push(uniqueLink);
     };
 
     return (

@@ -14,6 +14,7 @@ type Message = {
     chatId: string;
     createdAt: Date;
     user: string;
+    userId: string;
 };
 
 const ChatPage = () => {
@@ -21,7 +22,6 @@ const ChatPage = () => {
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState<Message[]>([]);
     const [user] = useAuthState(auth);
-
 
     useEffect(() => {
         if (!id) {
@@ -68,7 +68,6 @@ const ChatPage = () => {
                 createdAt: new Date(),
                 user: user?.displayName || 'Anonymous',
                 userId: user?.uid,
-
             });
             setMessage('');
         } catch (error) {
@@ -79,7 +78,9 @@ const ChatPage = () => {
 
     return (
         <Box sx={{ padding: 4 }}>
-            <Typography variant="h5" gutterBottom>Chat Room: {id}</Typography>
+            <Typography variant="h5" gutterBottom>
+                Chat Room: {id}
+            </Typography>
             <Box
                 sx={{
                     maxHeight: '400px',
@@ -90,9 +91,28 @@ const ChatPage = () => {
                 }}
             >
                 {messages.map((msg) => (
-                    <Typography key={msg.id} variant="body1">
-                        {msg.user}: {msg.text}
-                    </Typography>
+                    <Box
+                        key={msg.id}
+                        sx={{
+                            display: 'flex',
+                            justifyContent: msg.userId === user?.uid ? 'flex-end' : 'flex-start',
+                            marginBottom: '10px',
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                backgroundColor: msg.userId === user?.uid ? '#007bff' : '#e0e0e0',
+                                color: msg.userId === user?.uid ? '#fff' : '#000',
+                                borderRadius: '10px',
+                                padding: '10px',
+                                maxWidth: '60%',
+                            }}
+                        >
+                            <Typography variant="body1">
+                                {msg.text}
+                            </Typography>
+                        </Box>
+                    </Box>
                 ))}
             </Box>
             <TextField
@@ -101,6 +121,7 @@ const ChatPage = () => {
                 placeholder="Type your message..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
             />
             <Button variant="contained" color="primary" onClick={handleSendMessage} sx={{ marginTop: 2 }}>
                 Send
