@@ -2,7 +2,7 @@
 
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { collection, addDoc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import { db } from '@/app/firebase/clientApp';
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -20,12 +20,25 @@ type Message = {
 
 const ChatPage = () => {
     const { id } = useParams();
+    const router = useRouter();
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState<Message[]>([]);
-    const [user] = useAuthState(auth);
+    const [user, loading, error] = useAuthState(auth);
+
+    const messageEndRef = useRef<null | HTMLDivElement>(null)
+
+    const scrollToBottom = () => {
+        messageEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    }
 
     useEffect(() => {
-        if (typeof window !== "undefined") {
+        if (!loading && !user) {
+            router.push('/');
+        }
+    }, [loading, user, router]);
+
+    useEffect(() => {
+        if (typeof window !== "undefined" && user) {
             if (!id) return;
             const messagesQuery = query(
                 collection(db, 'messages'),
@@ -55,6 +68,10 @@ const ChatPage = () => {
         }
     }, [id]);
 
+    useEffect(() => {
+        scrollToBottom()
+    }, [messages])
+
     const handleSendMessage = async () => {
         if (!message.trim()) return;
         try {
@@ -72,15 +89,8 @@ const ChatPage = () => {
         }
     };
 
-    const messageEndRef = useRef<null | HTMLDivElement>(null)
-
-    const scrollToBottom = () => {
-        messageEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    }
-
-    useEffect(() => {
-        scrollToBottom()
-    }, [messages])
+    if (loading) return <p>Loading...</p>; // Optional loading screen
+    if (error) return <p>Error: {error.message}</p>;
 
     return (
         <Box sx={chatStyles.chatContainer}>
