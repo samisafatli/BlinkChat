@@ -8,6 +8,7 @@ import { db } from '@/app/firebase/clientApp';
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from '@/app/firebase/clientApp';
 import chatStyles from '../[id]/chatStyle';
+import GoBackButton from '@/app/Components/GoBackButton/GoBackButton';
 
 type Message = {
     id: string;
@@ -89,11 +90,12 @@ const ChatPage = () => {
         }
     };
 
-    if (loading) return <p>Loading...</p>; // Optional loading screen
+    if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error.message}</p>;
 
     return (
         <Box sx={chatStyles.chatContainer}>
+            <GoBackButton />
             <Typography variant="h5" gutterBottom>
                 Chat Room: {id}
             </Typography>
