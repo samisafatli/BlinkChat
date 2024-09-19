@@ -3,7 +3,7 @@
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { collection, addDoc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
+import { collection, addDoc, onSnapshot, query, where, orderBy, Timestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase/clientApp';
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from '@/app/firebase/clientApp';
@@ -14,7 +14,7 @@ type Message = {
     id: string;
     text: string;
     chatId: string;
-    createdAt: Date;
+    createdAt: Timestamp;
     user: string;
     userId: string;
 };
@@ -33,10 +33,16 @@ const ChatPage = () => {
     }
 
     useEffect(() => {
-        if (!loading && !user) {
-            router.push('/');
+        if (!loading) {
+            if (error) {
+                console.error('Authentication error:', error);
+                router.push('/');
+            } else if (!user) {
+                router.push('/');
+            }
         }
-    }, [loading, user, router]);
+    }, [loading, user, error, router]);
+
 
     useEffect(() => {
         if (typeof window !== "undefined" && user) {
@@ -52,10 +58,15 @@ const ChatPage = () => {
                 (snapshot) => {
                     if (snapshot.empty) return;
 
-                    const fetchedMessages = snapshot.docs.map((doc) => ({
-                        id: doc.id,
-                        ...doc.data(),
-                    })) as Message[];
+                    const fetchedMessages = snapshot.docs.map((doc) => {
+                        const data = doc.data();
+                        return {
+                            id: doc.id,
+                            ...data,
+                            createdAt: data.createdAt ? data.createdAt.toDate() : new Date(), // Convert Firebase Timestamp to JS Date
+                        };
+                    }) as Message[];
+
                     setMessages(fetchedMessages);
                 },
                 (error) => {
@@ -67,7 +78,7 @@ const ChatPage = () => {
                 unsubscribe();
             };
         }
-    }, [id]);
+    }, [id, user]);
 
     useEffect(() => {
         scrollToBottom()
@@ -118,7 +129,12 @@ const ChatPage = () => {
                 placeholder="Type your message..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendMessage();
+                    }
+                }}
                 sx={chatStyles.textField}
             />
             <Button
@@ -126,6 +142,7 @@ const ChatPage = () => {
                 color="primary"
                 onClick={handleSendMessage}
                 sx={chatStyles.sendButton}
+                disabled={!message.trim()}
             >
                 Send
             </Button>
