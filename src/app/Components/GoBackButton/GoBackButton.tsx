@@ -15,7 +15,7 @@ const GoBackButton = () => {
         <IconButton
             color="primary"
             onClick={handleGoBack}
-            sx={{ position: "absolute", top: 16, left: 16 }}
+            sx={{ position: "absolute", top: 16, paddingLeft: 0 }}
         >
             <ArrowBackIcon />
         </IconButton>

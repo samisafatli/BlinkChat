@@ -2,6 +2,8 @@
 
 import { Button, Container, Typography } from '@mui/material';
 import React, { useState } from 'react';
+import Link from "next/link"
+import mainBoxStyle from './mainBoxStyle';
 
 const MainBox = () => {
     const [link, setLink] = useState('');
@@ -13,7 +15,7 @@ const MainBox = () => {
     };
 
     return (
-        <Container>
+        <Container sx={mainBoxStyle.boxContainer}>
             <Typography variant="h6" gutterBottom>
                 Create your link here!
             </Typography>
@@ -27,7 +29,8 @@ const MainBox = () => {
             </Button>
             {link && (
                 <Typography variant="body1" sx={{ marginTop: '10px' }}>
-                    Your link: <a href={link}>{link}</a>
+                    Your link:{" "}
+                    <Link href={link}>{link}</Link>
                 </Typography>
             )}
         </Container>

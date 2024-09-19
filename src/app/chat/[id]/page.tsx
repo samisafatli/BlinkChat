@@ -107,7 +107,7 @@ const ChatPage = () => {
     return (
         <Box sx={chatStyles.chatContainer}>
             <GoBackButton />
-            <Typography variant="h5" gutterBottom>
+            <Typography sx={{ marginTop: 2 }} variant="h5" gutterBottom>
                 Chat Room: {id}
             </Typography>
             <Box sx={chatStyles.messageContainer}>
