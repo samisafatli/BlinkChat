@@ -63,7 +63,7 @@ const ChatPage = () => {
                         return {
                             id: doc.id,
                             ...data,
-                            createdAt: data.createdAt ? data.createdAt.toDate() : new Date(), // Convert Firebase Timestamp to JS Date
+                            createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
                         };
                     }) as Message[];
 
